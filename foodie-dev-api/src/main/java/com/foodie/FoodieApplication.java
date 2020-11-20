@@ -2,6 +2,7 @@ package com.foodie;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.security.servlet.SpringBootWebSecurityConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import tk.mybatis.spring.annotation.MapperScan;
@@ -10,7 +11,7 @@ import tk.mybatis.spring.annotation.MapperScan;
  * @author Gray
  * @date 2020/10/18 11:34
  */
-@SpringBootApplication
+@SpringBootApplication(exclude = SpringBootWebSecurityConfiguration.class)
 @MapperScan("com.foodie.mapper")
 @ComponentScan(basePackages =  {"com.foodie", "org.n3r.idworker"})
 @EnableScheduling   // 开启定时任务

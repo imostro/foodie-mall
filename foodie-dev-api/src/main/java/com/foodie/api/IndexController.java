@@ -110,6 +110,10 @@ public class IndexController {
         if (rootCatId == null){
             return JSONResult.ok("Id不能为空");
         }
+        // 防止缓存穿透
+        if (rootCatId < 0){
+            return JSONResult.errorMsg("Id不存在");
+        }
 
         List<NewItemsVO> vos = categoryService.querySixNewItemLazy(rootCatId);
         return JSONResult.ok(vos);
