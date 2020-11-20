@@ -23,6 +23,7 @@ public class CorsConfig {
         config.addAllowedOrigin("http://localhost:8080");
         config.addAllowedOrigin("http://114.116.252.186:8080");
         config.addAllowedOrigin("http://114.116.252.186:80");
+        config.addAllowedOrigin("http://114.116.252.186");
         config.addAllowedOrigin("payment.t.mukewang.com");
 
         // 设置是否发送cookie信息

@@ -2,10 +2,13 @@ package com.foodie.service;
 
 import com.foodie.enums.OrderStatusEnum;
 import com.foodie.pojo.OrderStatus;
+import com.foodie.pojo.bo.ShopcartBO;
 import com.foodie.pojo.bo.SubmitOrderBO;
 import com.foodie.pojo.vo.OrderVO;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * @author Gray
@@ -15,10 +18,12 @@ public interface OrderService extends BaseService {
 
     /**
      * 创建订单
+     *
+     * @param shopcartList
      * @param submitOrderBO 订单提交信息
      * @return orderId
      */
-    OrderVO createOrder(SubmitOrderBO submitOrderBO);
+    OrderVO createOrder(List<ShopcartBO> shopcartList, SubmitOrderBO submitOrderBO);
 
 
     /**

@@ -7,6 +7,7 @@ import com.foodie.mapper.OrderStatusMapper;
 import com.foodie.mapper.OrdersMapper;
 import com.foodie.mapper.OrdersMapperCustom;
 import com.foodie.pojo.*;
+import com.foodie.pojo.bo.ShopcartBO;
 import com.foodie.pojo.bo.SubmitOrderBO;
 import com.foodie.pojo.vo.MerchantOrdersVO;
 import com.foodie.pojo.vo.OrderVO;
@@ -20,9 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Gray
@@ -54,7 +53,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public OrderVO createOrder(SubmitOrderBO submitOrderBO) {
+    public OrderVO createOrder(List<ShopcartBO> shopcartList, SubmitOrderBO submitOrderBO) {
         String addressId = submitOrderBO.getAddressId();
         String itemSpecIds = submitOrderBO.getItemSpecIds();
         String leftMsg = submitOrderBO.getLeftMsg();
@@ -89,10 +88,22 @@ public class OrderServiceImpl implements OrderService {
 
         int realPayAmount = 0;
         int totalAmount = 0;
-        // TODO 整合redis后，商品购买的数量重新从redis的购物车中获取
-        int buyCounts = 1;
 
+        // 把shopcartList转换成map，以空间换时间
+        HashMap<String, ShopcartBO> cartMap = new HashMap<>(shopcartList.size());
+        for (ShopcartBO shopcartBO : shopcartList) {
+            cartMap.put(shopcartBO.getSpecId(), shopcartBO);
+        }
+
+        int buyCounts;
+        // 需要从购物车中移除的商品
+        List<ShopcartBO> toBeRemovedShopcatdList = new ArrayList<>();
         for (ItemsSpec itemsSpec : specList) {
+            // 整合redis后，商品购买的数量重新从redis的购物车中获取
+            ShopcartBO shopcartBO = cartMap.get(itemsSpec.getId());
+            toBeRemovedShopcatdList.add(shopcartBO);
+
+            buyCounts = shopcartBO.getBuyCounts();
             realPayAmount += itemsSpec.getPriceDiscount() * buyCounts;
             totalAmount += itemsSpec.getPriceNormal() * buyCounts;
 
@@ -136,11 +147,11 @@ public class OrderServiceImpl implements OrderService {
         merchantOrdersVO.setAmount(realPayAmount + postAmount);
         merchantOrdersVO.setPayMethod(payMethod);
 
-        //  构建自定义订单
+        //  6.构建自定义订单
         OrderVO orderVO = new OrderVO();
         orderVO.setOrderId(orderId);
         orderVO.setMerchantOrdersVO(merchantOrdersVO);
-
+        orderVO.setToBeRemovedShopcartList(toBeRemovedShopcatdList);
         return orderVO;
     }
 
