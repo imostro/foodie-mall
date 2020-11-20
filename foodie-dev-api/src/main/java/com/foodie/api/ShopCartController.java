@@ -71,8 +71,8 @@ public class ShopCartController {
         // 添加或覆盖redis中的购物车商品
         String listJson = JsonUtils.objectToJson(list);
         redisOperator.set(cartKey, listJson);
-        // 覆盖现有redis中的购物车
-        redisOperator.set(cartKey, listJson);
+        // 更新客户端cookie
+        CookieUtils.setCookie(request, response, FOODIE_SHOPCART, listJson);
         return JSONResult.ok();
     }
 
